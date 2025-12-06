@@ -6,8 +6,8 @@ import os
 app = FastAPI()
 
 @app.get("/")
-async def get():
-    return {"message": "FastAPI server is running."}
+async def home():
+    return {"message": "FastAPI server is running on Render!"}
 
 @app.get("/proxy")
 async def proxy(accountNumber: str):
@@ -20,9 +20,15 @@ async def proxy(accountNumber: str):
             response.raise_for_status()
             return JSONResponse(content=response.json())
         except httpx.HTTPStatusError as e:
-            return JSONResponse(content={"error": f"HTTP error occurred: {e.response.status_code}"}, status_code=e.response.status_code)
+            return JSONResponse(
+                content={"error": f"HTTP error occurred: {e.response.status_code}"},
+                status_code=e.response.status_code
+            )
         except httpx.RequestError as e:
-            return JSONResponse(content={"error": f"An error occurred while requesting {e.request.url!r}."}, status_code=500)
+            return JSONResponse(
+                content={"error": f"An error occurred while requesting {e.request.url!r}."},
+                status_code=500
+            )
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -33,5 +39,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
+    # Render provides PORT environment variable
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
